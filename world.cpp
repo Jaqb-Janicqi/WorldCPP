@@ -1,10 +1,10 @@
 #include <iostream>
 #include <vector>
-#include <time.h>
 using namespace std;
 
 #include "Organism.cpp"
-#include "global.h"
+#include "Plant.cpp"
+#include "Animal.cpp"
 
 
 
@@ -12,6 +12,7 @@ class World {
 private:
     vector<vector<char>> board;
     vector<Organism> organisms;
+    int worldSizeX, worldSizeY;
     
 public:
     World(int x, int y){
