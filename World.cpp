@@ -17,6 +17,7 @@
 #include "Guarana.cpp"
 #include "Belladona.cpp"
 #include "SosnowskyWeed.cpp"
+#include "Human.cpp"
 
 
 class World {
@@ -47,17 +48,18 @@ private:
     {
         for (int i = 0; i < organisms.size(); i++)
         {
+            if (organisms[i].id == 0) drawWorld();
             organisms[i].action();
             for (int j = 0; j < organisms.size(); j++)
             {
                 if (organisms[i].posX == organisms[j].posX && organisms[i].posY == organisms[j].posY)
                 {
-                    Transporter *data = organisms[i].collision(&organisms[j]);
+                    Transporter *data = organisms[j].collision(&organisms[i]);
                     if (data)
                     {
                         addOrganism(data->id, data->posX, data->posY);
-                        delete data;
                     }
+                    delete data;
 
                     if (!organisms[i].alive)
                     {

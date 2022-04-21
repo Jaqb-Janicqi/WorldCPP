@@ -29,15 +29,20 @@ public:
         prevY = posY;
     }
 
-    int randMove()
+    virtual int randMove()
     {
         int x = randInt(0, 2);
+        while (x == 0)
+        {
+            x = randInt(0, 2);
+        }
         return x-1;
     }
     
-    void action()
+    virtual void action()
     {
-        if(!immobile){
+        if(!immobile)
+        {
             if(randInt(0, 1))        // make random move in one direction 
             {
                 int moveX = randMove();
@@ -63,7 +68,7 @@ public:
         }
     }
 
-    Transporter* collision(Organism *enemy)
+    virtual Transporter* collision(Organism *enemy)
     {
         if (enemy->id == id)
         {
@@ -92,7 +97,7 @@ public:
                 biggerY = enemy->posY;
             }
 
-            while (!(newX != posX && newX != enemy->posX)) newX = randInt(smallerX-1, biggerX+1);
+            while (!(newX != posX && newX != enemy->posX)) newX = randInt(smallerX-1, biggerX+1);       //TODO new animal should spawn on empty place
             while (!(newY != posY && newY != enemy->posY)) newY = randInt(smallerY-1, biggerY+1);
             
             Transporter *data = new Transporter(id, newX, newY);
@@ -113,7 +118,7 @@ public:
         }
     }
 
-    void draw()     //place organism's char in its cell
+    virtual void draw()     //place organism's char in its cell
     {
         *occupiedCell = skin;
     }
