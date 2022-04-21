@@ -1,6 +1,6 @@
 #pragma once
 #include "Organism.cpp"
 
-class Animal : Organism {
-
+class Animal : public Organism {
+    
 };
