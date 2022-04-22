@@ -1,6 +1,7 @@
 #pragma once
 #include "../RandomFromRange.cpp"
-#include "../global.h"
+#include "../Global.h"
+#include "../Transporter.h"
 
 
 class Organism {
@@ -42,7 +43,7 @@ public:
         return x-1;
     }
     
-    virtual void action()
+    virtual void action(vector<vector<char>> &board)
     {
         if(!immobile)
         {
@@ -69,9 +70,10 @@ public:
             prevY = posY;
             immobile = false;
         }
+        occupiedCell = &board[posY][posX];      //pointer to cell should be an iterator?    //TODO
     }
 
-    virtual void collision(Organism *enemy)
+    virtual Transporter* collision(Organism *enemy, vector<Organism> &organisms)
     {
         if (enemy->id == id)
         {
@@ -99,21 +101,61 @@ public:
                 smallerY = posY;
                 biggerY = enemy->posY;
             }
+            
+            int freeSpaces = 0;
+            int randomIndex;
+            vector<int> validIndexes;
+            int freeCoordinates[10][2];    // [index][0-y 1-x]
 
-            while (!(newX != posX && newX != enemy->posX)) newX = randInt(smallerX-1, biggerX+1);       //TODO new animal should spawn on empty place
-            while (!(newY != posY && newY != enemy->posY)) newY = randInt(smallerY-1, biggerY+1);
+            for (int y = smallerY-1; y <= biggerY+1; y++)       //get coordinates around two organisms
+            {
+                if(y != smallerY && y != biggerY && y >= 0 && y < worldSizeY) 
+                {
+                    for (int x = smallerX-1; x <= biggerX+1; x++)
+                    {
+                        if (x != smallerX && x != biggerX && x >= 0 && x < worldSizeX)
+                        {
+                            freeCoordinates[freeSpaces][0] = y;
+                            freeCoordinates[freeSpaces][1] = x;
+                            validIndexes.push_back(freeSpaces);
+                            freeSpaces++;
+                        }
+                    }
+                }
+            }
 
-            // world->addOrganism(id, newX, newY, animal);            
+            for (int i = 0; i < organisms.size(); i++)      //remove 
+            {
+                for (int j = 0; j < freeSpaces; j++)
+                {
+                    if (organisms[i].posY == freeCoordinates[j][0] && organisms[i].posX == freeCoordinates[j][1])
+                    {
+                        validIndexes.erase(validIndexes.begin() + j);
+                    }
+                }
+            }
+
+            if (freeSpaces > 0)
+            {
+                randomIndex = randInt(0, validIndexes.size()-1);
+                newY = freeCoordinates[randomIndex][0];
+                newX = freeCoordinates[randomIndex][1];
+                Transporter *data = new Transporter(id, newX, newY, animal);
+                return data;
+            }
+            else return NULL;
         }
         else
         {
             if (enemy->strength < strength)
             {
-                alive = false;      //TODO organisms can be killed/removed from here, fix
+                alive = false;
+                return NULL;
             }
             else
             {
                 enemy->alive = false;
+                return NULL;
             }
         }
     }

@@ -1,6 +1,7 @@
 #pragma once
 #include "../Animal.cpp"
 #include "../../../RandomFromRange.cpp"
+#include "../../../Global.h"
 
 class Turtle : public Animal {
 public:

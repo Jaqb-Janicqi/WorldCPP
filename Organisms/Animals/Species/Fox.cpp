@@ -1,5 +1,6 @@
 #pragma once
 #include "../Animal.cpp"
+#include "../../../Global.h"
 
 class Fox : public Animal {
 public:

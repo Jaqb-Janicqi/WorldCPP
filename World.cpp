@@ -1,7 +1,7 @@
 #include <vector>
 
 #pragma once
-#include "global.h"
+#include "Global.h"
 #include "RandomFromRange.cpp"
 #include "Organisms/Organism.cpp"
 #include "Organisms/Animals/Animal.cpp"
@@ -10,7 +10,6 @@
 #include "Organisms/Animals/Species/Fox.cpp"
 #include "Organisms/Animals/Species/Turtle.cpp"
 #include "Organisms/Animals/Species/Antelope.cpp"
-#include "Organisms/Animals/Species/CyberSheep.cpp"
 #include "Organisms/Animals/Species/Human.cpp"
 #include "Organisms/Plants/Plant.cpp"
 #include "Organisms/Plants/Species/Grass.cpp"
@@ -22,9 +21,66 @@
 
 class World {
 public:
-    vector<Organism> organisms;
     const int worldSizeX, worldSizeY;
     World(int x, int y) : worldSizeX(x), worldSizeY(y){}
+
+    void makeTurn()
+    {
+        for (int i = 0; i < organisms.size(); i++)
+        {
+            if (organisms[i].id == 0) drawWorld();
+
+            organisms[i].action(board);
+
+            for (int j = 0; j < organisms.size(); j++)
+            {
+                if (i != j && organisms[i].posX == organisms[j].posX && organisms[i].posY == organisms[j].posY)
+                {
+                    Transporter *data = organisms[j].collision(&organisms[i], organisms);
+
+                    if (!organisms[i].alive) removeOrganism(i);
+                    if (!organisms[j].alive) removeOrganism(j);
+
+                    if (data)
+                    {
+                        addOrganism(data->id, data->posX, data->posY, data->animal);
+                    }
+                    delete data;
+                }
+            }
+        }
+        drawWorld();
+    }
+
+    void addOrganism(int orgarnismId, bool animal)
+    {
+        if(organisms.size() >= worldSizeX*worldSizeY) return;
+
+        int x = randInt(0, worldSizeX);
+        int y = randInt(0, worldSizeY);
+        int i = 0;
+
+        while(i < organisms.size())
+        {
+            if (x == organisms[i].posX)
+            {
+                i = 0;
+                x = randInt(0, worldSizeX);
+            }
+            else if (y == organisms[i].posY)
+            {
+                i = 0;
+                y = randInt(0, worldSizeY);
+            }            
+            else i++;
+        }
+
+        addOrganism(orgarnismId, x, y, animal);
+    }
+
+private:
+    vector<vector<char>> board;
+    vector<Organism> organisms;
 
     void addOrganism(int orgarnismId, int x, int y, bool animal)
     {
@@ -51,10 +107,6 @@ public:
 
             case 5:
                 newOrganism = new Antelope(x, y);
-                break;
-
-            case 6:
-                newOrganism = new CyberSheep(x, y);
                 break;
             
             default:
@@ -105,40 +157,11 @@ public:
         else organisms.insert(organisms.begin(), *newOrganism);
 
         delete newOrganism;
-        
     }
 
     void removeOrganism(int vectPos)
     {
         organisms.erase(organisms.begin() + vectPos);
-    }
-
-private:
-    vector<vector<char>> board;
-
-    void makeTurn()
-    {
-        for (int i = 0; i < organisms.size(); i++)
-        {
-            if (organisms[i].id == 0) drawWorld();
-            organisms[i].action();
-            for (int j = 0; j < organisms.size(); j++)
-            {
-                if (organisms[i].posX == organisms[j].posX && organisms[i].posY == organisms[j].posY)
-                {
-                    organisms[j].collision(&organisms[i]);
-
-                    if (!organisms[i].alive)
-                    {
-                        removeOrganism(i);
-                    }
-                    if (!organisms[j].alive)
-                    {
-                        removeOrganism(j);
-                    }
-                }
-            }
-        }
     }
 
     void drawWorld()
@@ -155,7 +178,7 @@ private:
         {
             organisms[i].draw();
         }
-        
+
         for (int y = 0; y < worldSizeY; y++)
         {
             for (int x = 0; x < worldSizeX; x++)

@@ -1,14 +1,16 @@
 #include <iostream>
 using namespace std;
-
-#include "global.h"
+#include "Global.h"
 #include "World.cpp"
 
+int worldSizeX, worldSizeY;
 int main()
 {
-    int x, y;
     cout << "Please give world dimensions x, y" << endl;
-    cin >> x >> y;
-    World world(x, y);
+    cin >> worldSizeX >> worldSizeY;
+    World world(worldSizeX, worldSizeY);
+    world.addOrganism(1, true);
+    world.addOrganism(2, true);
+    world.makeTurn();
     return 0;
 }
