@@ -2,10 +2,30 @@
 #include "../Animal.cpp"
 
 class Fox : public Animal {
-    int id = 3;
-    int strength = 3;
-    int initiative = 7;
-    char skin = '*';
+public:
+    Fox(int x, int y)
+    {
+        posX = x;
+        posY = y;
+        prevX = posX;
+        prevY = posY;
+        id = 3;
+        strength = 3;
+        initiative = 7;
+        skin = '*';
+    }
+
+    Fox()
+    {
+        posX = randInt(0, worldSizeX);
+        posY = randInt(0, worldSizeY);
+        prevX = posX;
+        prevY = posY;
+        id = 3;
+        strength = 3;
+        initiative = 7;
+        skin = '*';
+    }
 
     void action()       //TODO will never move into cell occupied by stronger organism
     {

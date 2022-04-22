@@ -2,10 +2,30 @@
 #include "../Animal.cpp"
 
 class Antelope : public Animal {
-    int id = 5;
-    int strength = 4;
-    int initiative = 4;
-    char skin = ';';
+public:
+    Antelope(int x, int y)
+    {
+        posX = x;
+        posY = y;
+        prevX = posX;
+        prevY = posY;
+        id = 5;
+        strength = 4;
+        initiative = 4;
+        skin = ';';
+    }
+
+    Antelope()
+    {
+        posX = randInt(0, worldSizeX);
+        posY = randInt(0, worldSizeY);
+        prevX = posX;
+        prevY = posY;
+        id = 5;
+        strength = 4;
+        initiative = 4;
+        skin = ';';
+    }
 
     virtual void action()
     {
@@ -36,7 +56,7 @@ class Antelope : public Animal {
         }
     }
 
-    Transporter* collision(Organism *enemy)
+    void collision(Organism *enemy)
     {
         if (enemy->id == id)
         {
@@ -68,8 +88,6 @@ class Antelope : public Animal {
             while (!(newX != posX && newX != enemy->posX)) newX = randInt(smallerX-1, biggerX+1);       //TODO new animal should spawn on empty place
             while (!(newY != posY && newY != enemy->posY)) newY = randInt(smallerY-1, biggerY+1);
             
-            Transporter *data = new Transporter(id, newX, newY, animal);
-            return data;
         }
         else
         {
@@ -97,12 +115,10 @@ class Antelope : public Animal {
                 if (enemy->strength < strength)
                 {
                     alive = false;
-                    return NULL;
                 }
                 else
                 {
                     enemy->alive = false;
-                    return NULL;
                 }
             }
         }

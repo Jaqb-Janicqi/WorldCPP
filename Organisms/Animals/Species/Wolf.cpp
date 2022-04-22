@@ -4,7 +4,6 @@
 
 class Wolf : public Animal {
 public:
-
     Wolf(int x, int y)
     {
         posX = x;

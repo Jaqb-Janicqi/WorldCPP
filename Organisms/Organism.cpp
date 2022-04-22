@@ -42,7 +42,7 @@ public:
         return x-1;
     }
     
-    virtual void action(const World *world)
+    virtual void action()
     {
         if(!immobile)
         {
@@ -71,7 +71,7 @@ public:
         }
     }
 
-    virtual void collision(Organism *enemy, World *world)
+    virtual void collision(Organism *enemy)
     {
         if (enemy->id == id)
         {
@@ -103,7 +103,7 @@ public:
             while (!(newX != posX && newX != enemy->posX)) newX = randInt(smallerX-1, biggerX+1);       //TODO new animal should spawn on empty place
             while (!(newY != posY && newY != enemy->posY)) newY = randInt(smallerY-1, biggerY+1);
 
-            world->addOrganism(id, newX, newY, animal);            
+            // world->addOrganism(id, newX, newY, animal);            
         }
         else
         {

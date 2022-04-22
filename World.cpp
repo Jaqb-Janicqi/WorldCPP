@@ -24,11 +24,11 @@ class World {
 public:
     vector<Organism> organisms;
     const int worldSizeX, worldSizeY;
-    World(int x, int y) : worldSizeX(x), worldSizeY(y){} 
+    World(int x, int y) : worldSizeX(x), worldSizeY(y){}
 
     void addOrganism(int orgarnismId, int x, int y, bool animal)
     {
-        Organism *newOrganism;
+        Organism *newOrganism = NULL;
         if (animal)
         {
             switch (orgarnismId)
@@ -38,23 +38,23 @@ public:
                 break;
 
             case 2:
-                /* code */
+                newOrganism = new Sheep(x, y);
                 break;
 
             case 3:
-                /* code */
+                newOrganism = new Fox(x, y);
                 break;
 
             case 4:
-                /* code */
+                newOrganism = new Turtle(x, y);
                 break;
 
             case 5:
-                /* code */
+                newOrganism = new Antelope(x, y);
                 break;
 
             case 6:
-                /* code */
+                newOrganism = new CyberSheep(x, y);
                 break;
             
             default:
@@ -66,30 +66,45 @@ public:
             switch (orgarnismId)
             {
             case 1:
-                /* code */
+                newOrganism = new Grass(x, y);
                 break;
 
             case 2:
-                /* code */
+                newOrganism = new SowThistle(x, y);
                 break;
 
             case 3:
-                /* code */
+                newOrganism = new Guarana(x, y);
                 break;
 
             case 4:
-                /* code */
+                newOrganism = new Belladona(x, y);
                 break;
 
             case 5:
-                /* code */
+                newOrganism = new SosnowskyWeed(x, y);
                 break;
             
             default:
                 break;
             }
         }
-        
+
+        if(organisms.size() >= 1)       //mainains a sorted vector of organisms (youngest organisms inserted at last pos of given initiative)
+        {
+            for (int i = organisms.size(); i >= 1; i--)
+            {
+                if (!(organisms[i-1].initiative < newOrganism->initiative))
+                {
+                    organisms.insert(organisms.begin() + i, *newOrganism);
+                    break;
+                }
+                if (i == 1) organisms.insert(organisms.begin(), *newOrganism);
+            }
+        }
+        else organisms.insert(organisms.begin(), *newOrganism);
+
+        delete newOrganism;
         
     }
 
@@ -106,12 +121,12 @@ private:
         for (int i = 0; i < organisms.size(); i++)
         {
             if (organisms[i].id == 0) drawWorld();
-            organisms[i].action(this);
+            organisms[i].action();
             for (int j = 0; j < organisms.size(); j++)
             {
                 if (organisms[i].posX == organisms[j].posX && organisms[i].posY == organisms[j].posY)
                 {
-                    organisms[j].collision(&organisms[i], this);
+                    organisms[j].collision(&organisms[i]);
 
                     if (!organisms[i].alive)
                     {

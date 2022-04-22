@@ -2,8 +2,28 @@
 #include "../Animal.cpp"
 
 class Sheep : public Animal {
-    int id = 2;
-    int strength = 4;
-    int initiative = 4;
-    char skin = '%';
+public:
+    Sheep(int x, int y)
+    {
+        posX = x;
+        posY = y;
+        prevX = posX;
+        prevY = posY;
+        id = 2;
+        strength = 4;
+        initiative = 4;
+        skin = '%';
+    }
+
+    Sheep()
+    {
+        posX = randInt(0, worldSizeX);
+        posY = randInt(0, worldSizeY);
+        prevX = posX;
+        prevY = posY;
+        id = 2;
+        strength = 4;
+        initiative = 4;
+        skin = '%';
+    }
 };

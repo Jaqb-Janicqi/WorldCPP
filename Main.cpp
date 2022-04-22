@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 
+#include "global.h"
 #include "World.cpp"
 
 int main()

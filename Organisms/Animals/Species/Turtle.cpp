@@ -3,10 +3,30 @@
 #include "../../../RandomFromRange.cpp"
 
 class Turtle : public Animal {
-    int id = 4;
-    int strength = 2;
-    int initiative = 1;
-    char skin = '@';
+public:
+    Turtle(int x, int y)
+    {
+        posX = x;
+        posY = y;
+        prevX = posX;
+        prevY = posY;
+        id = 4;
+        strength = 2;
+        initiative = 1;
+        skin = '@';
+    }
+
+    Turtle()
+    {
+        posX = randInt(0, worldSizeX);
+        posY = randInt(0, worldSizeY);
+        prevX = posX;
+        prevY = posY;
+        id = 4;
+        strength = 2;
+        initiative = 1;
+        skin = '@';
+    }
 
     void action()
     {
