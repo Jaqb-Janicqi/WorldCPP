@@ -1,5 +1,5 @@
 #pragma once
-#include "Animal.cpp"
+#include "../Animal.cpp"
 
 class CyberSheep : public Animal {
     

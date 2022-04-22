@@ -1,5 +1,5 @@
 #pragma once
-#include "Animal.cpp"
+#include "../Animal.cpp"
 
 class Sheep : public Animal {
     int id = 2;

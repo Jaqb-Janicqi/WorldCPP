@@ -1,20 +1,19 @@
 #pragma once
-#include "Animal.cpp"
-#include "RandomFromRange.cpp"
+#include "../Animal.cpp"
 
-class Turtle : public Animal {
-    int id = 4;
-    int strength = 2;
-    int initiative = 1;
-    char skin = '@';
+class Antelope : public Animal {
+    int id = 5;
+    int strength = 4;
+    int initiative = 4;
+    char skin = ';';
 
-    void action()
+    virtual void action()
     {
-        if(!immobile && randInt(0,4) == 0)
+        if(!immobile)
         {
             if(randInt(0, 1))
             {
-                int moveX = randMove();
+                int moveX = randMove()*randInt(1, 2);
                 while (!(moveX+posX >= 0 && moveX+posX < worldSizeX)) moveX = randMove();
                 prevX = posX;
                 posX += moveX;
@@ -66,26 +65,46 @@ class Turtle : public Animal {
                 biggerY = enemy->posY;
             }
 
-            while (!(newX != posX && newX != enemy->posX)) newX = randInt(smallerX-1, biggerX+1);
+            while (!(newX != posX && newX != enemy->posX)) newX = randInt(smallerX-1, biggerX+1);       //TODO new animal should spawn on empty place
             while (!(newY != posY && newY != enemy->posY)) newY = randInt(smallerY-1, biggerY+1);
             
-            Transporter *data = new Transporter(id, newX, newY);
+            Transporter *data = new Transporter(id, newX, newY, animal);
             return data;
         }
         else
         {
-            if (enemy->strength < 5)
+            if(randInt(0, 1))   //TODO move to a free cell
             {
-                enemy->posX = enemy->prevX;
-                enemy->posY = enemy->prevY;
-                return NULL;
+                // if(randInt(0, 1))
+                // {
+                //     int moveX = randMove()*randInt(1, 2);
+                //     while (!(moveX+posX >= 0 && moveX+posX < worldSizeX)) moveX = randMove();
+                //     prevX = posX;
+                //     posX += moveX;
+                //     prevY = posY;
+                // }
+                // else
+                // {
+                //     int moveY = randMove();
+                //     while (!(moveY+posY >= 0 && moveY+posY < worldSizeY)) moveY = randMove();
+                //     prevY = posY;
+                //     posY += moveY;
+                //     prevX = posX;
+                // }
             }
             else
             {
-                enemy->alive = false;
-                return NULL;
+                if (enemy->strength < strength)
+                {
+                    alive = false;
+                    return NULL;
+                }
+                else
+                {
+                    enemy->alive = false;
+                    return NULL;
+                }
             }
         }
     }
-
 };

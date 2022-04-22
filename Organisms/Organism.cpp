@@ -1,6 +1,6 @@
 #pragma once
-#include "RandomFromRange.cpp"
-#include "Transporter.h"
+#include "../RandomFromRange.cpp"
+#include "../global.h"
 
 
 class Organism {
@@ -10,6 +10,9 @@ public:
     char skin;
     bool immobile = false;
     bool alive = true;
+    bool animal;
+
+    Organism(){}
 
     Organism(int id)
     {
@@ -39,7 +42,7 @@ public:
         return x-1;
     }
     
-    virtual void action()
+    virtual void action(const World *world)
     {
         if(!immobile)
         {
@@ -68,7 +71,7 @@ public:
         }
     }
 
-    virtual Transporter* collision(Organism *enemy)
+    virtual void collision(Organism *enemy, World *world)
     {
         if (enemy->id == id)
         {
@@ -99,21 +102,18 @@ public:
 
             while (!(newX != posX && newX != enemy->posX)) newX = randInt(smallerX-1, biggerX+1);       //TODO new animal should spawn on empty place
             while (!(newY != posY && newY != enemy->posY)) newY = randInt(smallerY-1, biggerY+1);
-            
-            Transporter *data = new Transporter(id, newX, newY);
-            return data;
+
+            world->addOrganism(id, newX, newY, animal);            
         }
         else
         {
             if (enemy->strength < strength)
             {
-                alive = false;
-                return NULL;
+                alive = false;      //TODO organisms can be killed/removed from here, fix
             }
             else
             {
                 enemy->alive = false;
-                return NULL;
             }
         }
     }

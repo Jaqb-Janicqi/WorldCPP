@@ -1,5 +1,5 @@
 #pragma once
-#include "Plant.cpp"
+#include "../Plant.cpp"
 
 class SosnowskyWeed : Plant {
     

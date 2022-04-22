@@ -1,1 +1,1 @@
-extern const int worldSizeX, worldSizeY;
+extern int worldSizeX, worldSizeY;

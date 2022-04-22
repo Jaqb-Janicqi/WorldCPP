@@ -1,12 +1,7 @@
 #include <iostream>
 using namespace std;
 
-#include "global.h"
 #include "World.cpp"
-#include "Organism.cpp"
-#include "Plant.cpp"
-#include "Animal.cpp"
-#include "Human.cpp"
 
 int main()
 {
