@@ -7,7 +7,6 @@
 class Organism {
 public:
     int id, strength, initiative, posX, posY, prevX, prevY;
-    char *occupiedCell;
     char skin;
     bool immobile = false;
     bool alive = true;
@@ -35,33 +34,45 @@ public:
 
     virtual int randMove()
     {
-        int x = randInt(0, 2);
-        while (x == 0)
+        int x = 1;
+        while (x == 1)
         {
             x = randInt(0, 2);
         }
         return x-1;
     }
     
-    virtual void action(vector<vector<char>> &board)
+    virtual void action()
     {
         if(!immobile)
         {
             if(randInt(0, 1))        // make random move in one direction 
             {
                 int moveX = randMove();
-                while (!(moveX+posX >= 0 && moveX+posX < worldSizeX)) moveX = randMove();
-                prevX = posX;
-                posX += moveX;
-                prevY = posY;
+                if (!(moveX+posX >= 0 && moveX+posX < worldSizeX-1))
+                {
+                    action();
+                }
+                else
+                {
+                    prevY = posY;
+                    prevX = posX;
+                    posX += moveX;
+                }
             }
             else
             {
                 int moveY = randMove();
-                while (!(moveY+posY >= 0 && moveY+posY < worldSizeY)) moveY = randMove();
-                prevY = posY;
-                posY += moveY;
-                prevX = posX;
+                if (!(moveY+posY >= 0 && moveY+posY < worldSizeY-1))
+                {
+                    action();
+                }
+                else
+                {
+                    prevY = posY;
+                    prevX = posX;
+                    posY += moveY;
+                }
             }
         }
         else
@@ -70,7 +81,6 @@ public:
             prevY = posY;
             immobile = false;
         }
-        occupiedCell = &board[posY][posX];      //pointer to cell should be an iterator?    //TODO
     }
 
     virtual Transporter* collision(Organism *enemy, vector<Organism> &organisms)
@@ -80,26 +90,26 @@ public:
             int newX, newY, smallerX, smallerY, biggerX, biggerY;
             enemy->immobile = true;
 
-            if(enemy->posX < posX)
+            if(enemy->prevX < posX)
             {
-                smallerX = enemy->posX;
+                smallerX = enemy->prevX;
                 biggerX = posX;
             }
             else
             {
                 smallerX = posX;
-                biggerX = enemy->posX;
+                biggerX = enemy->prevX;
             }
 
-            if(enemy->posY < posY)
+            if(enemy->prevY < posY)
             {
-                smallerY = enemy->posY;
+                smallerY = enemy->prevY;
                 biggerY = posY;
             }
             else
             {
                 smallerY = posY;
-                biggerY = enemy->posY;
+                biggerY = enemy->prevY;
             }
             
             int freeSpaces = 0;
@@ -160,8 +170,8 @@ public:
         }
     }
 
-    virtual void draw()     //place organism's char in its cell
+    virtual char draw()     //place organism's char in its cell
     {
-        *occupiedCell = skin;
+        return skin;
     }
 };

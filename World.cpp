@@ -20,66 +20,15 @@
 
 
 class World {
-public:
-    const int worldSizeX, worldSizeY;
-    World(int x, int y) : worldSizeX(x), worldSizeY(y){}
+public: 
+    const int ConstWorldSizeX, ConstworldSizeY;
+    vector<vector<char>> board;
 
-    void makeTurn()
-    {
-        for (int i = 0; i < organisms.size(); i++)
-        {
-            if (organisms[i].id == 0) drawWorld();
-
-            organisms[i].action(board);
-
-            for (int j = 0; j < organisms.size(); j++)
-            {
-                if (i != j && organisms[i].posX == organisms[j].posX && organisms[i].posY == organisms[j].posY)
-                {
-                    Transporter *data = organisms[j].collision(&organisms[i], organisms);
-
-                    if (!organisms[i].alive) removeOrganism(i);
-                    if (!organisms[j].alive) removeOrganism(j);
-
-                    if (data)
-                    {
-                        addOrganism(data->id, data->posX, data->posY, data->animal);
-                    }
-                    delete data;
-                }
-            }
-        }
-        drawWorld();
-    }
-
-    void addOrganism(int orgarnismId, bool animal)
-    {
-        if(organisms.size() >= worldSizeX*worldSizeY) return;
-
-        int x = randInt(0, worldSizeX);
-        int y = randInt(0, worldSizeY);
-        int i = 0;
-
-        while(i < organisms.size())
-        {
-            if (x == organisms[i].posX)
-            {
-                i = 0;
-                x = randInt(0, worldSizeX);
-            }
-            else if (y == organisms[i].posY)
-            {
-                i = 0;
-                y = randInt(0, worldSizeY);
-            }            
-            else i++;
-        }
-
-        addOrganism(orgarnismId, x, y, animal);
+    World(int x, int y) : ConstWorldSizeX(x), ConstworldSizeY(y){
+        board.resize(y , vector<char> (x, ' '));
     }
 
 private:
-    vector<vector<char>> board;
     vector<Organism> organisms;
 
     void addOrganism(int orgarnismId, int x, int y, bool animal)
@@ -166,6 +115,16 @@ private:
 
     void drawWorld()
     {
+        auto horizLine = []()
+        {
+            for (int i = 0; i < worldSizeX+2; i++)
+            {
+                if(i != 0) cout << ' ';
+                cout << '=';
+            }
+            cout << endl;
+        };
+
         for (int y = 0; y < worldSizeY; y++)
         {
             for (int x = 0; x < worldSizeX; x++)
@@ -176,16 +135,75 @@ private:
 
         for (int i = 0; i < organisms.size(); i++)
         {
-            organisms[i].draw();
+            board[organisms[i].posY][organisms[i].posX] = organisms[i].draw();
         }
 
         for (int y = 0; y < worldSizeY; y++)
         {
+            if(y == 0) horizLine();
+
             for (int x = 0; x < worldSizeX; x++)
             {
-                cout << board[y][x];
+                if(x == 0) cout << '|' << ' ';
+                cout << board[y][x] << ' ';
             }
-            cout << endl;
+            cout << '|' << endl;
+
+            if(y == worldSizeY-1) horizLine();
         }
     }
+
+public:
+    void makeTurn()
+    {
+        for (int i = 0; i < organisms.size(); i++)
+        {
+            if (organisms[i].id == 0) drawWorld();
+
+            organisms[i].action();
+
+            for (int j = 0; j < organisms.size(); j++)
+            {
+                if (i != j && organisms[i].posX == organisms[j].posX && organisms[i].posY == organisms[j].posY)
+                {
+                    Transporter *data = organisms[j].collision(&organisms[i], organisms);
+
+                    if (!organisms[i].alive) removeOrganism(i);
+                    if (!organisms[j].alive) removeOrganism(j);
+
+                    if (data)
+                    {
+                        addOrganism(data->id, data->posX, data->posY, data->animal);
+                    }
+                    delete data;
+                }
+            }
+        }
+        drawWorld();
+    }
+
+    void addOrganism(int orgarnismId, bool animal)
+    {
+        if(organisms.size() >= worldSizeX*worldSizeY) return;
+
+        int x = randInt(0, worldSizeX-1);
+        int y = randInt(0, worldSizeY-1);
+        int i = 0;
+
+        while(i < organisms.size())
+        {
+            if (x == organisms[i].posX && y == organisms[i].posY)
+            {
+                i = 0;
+                x = randInt(0, worldSizeX-1);
+                y = randInt(0, worldSizeY-1);
+            } 
+            else i++;
+        }
+
+        addOrganism(orgarnismId, x, y, animal);
+    }
+
+private:
+    
 };
