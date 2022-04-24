@@ -14,24 +14,6 @@ public:
 
     Organism(){}
 
-    Organism(int id)
-    {
-        id = id;
-        posX = randInt(0, worldSizeX);
-        posY = randInt(0, worldSizeY);
-        prevX = posX;
-        prevY = posY;
-    }
-
-    Organism(int id, int x, int y)
-    {
-        id = id;
-        posX = x;
-        posY = y;
-        prevX = posX;
-        prevY = posY;
-    }
-
     virtual int randMove()
     {
         int x = 1;
@@ -89,6 +71,9 @@ public:
         {
             int newX, newY, smallerX, smallerY, biggerX, biggerY;
             enemy->immobile = true;
+            immobile = true;
+            enemy->posX = enemy->prevX;
+            enemy->posY = enemy->prevY;
 
             if(enemy->prevX < posX)
             {
@@ -141,16 +126,25 @@ public:
                     if (organisms[i].posY == freeCoordinates[j][0] && organisms[i].posX == freeCoordinates[j][1])
                     {
                         validIndexes.erase(validIndexes.begin() + j);
+                        freeSpaces--;
                     }
                 }
             }
+            validIndexes.shrink_to_fit();
 
-            if (freeSpaces > 0)
+            if (freeSpaces > 1)
             {
                 randomIndex = randInt(0, validIndexes.size()-1);
                 newY = freeCoordinates[randomIndex][0];
                 newX = freeCoordinates[randomIndex][1];
-                Transporter *data = new Transporter(id, newX, newY, animal);
+                Transporter *data = new Transporter(id, newX, newY, this->animal);
+                return data;
+            }
+            else if(freeSpaces == 1)
+            {
+                newY = freeCoordinates[0][0];
+                newX = freeCoordinates[0][1];
+                Transporter *data = new Transporter(id, newX, newY, this->animal);
                 return data;
             }
             else return NULL;

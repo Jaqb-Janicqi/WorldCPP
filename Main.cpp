@@ -1,5 +1,12 @@
 #include <iostream>
+#include <conio.h>
 using namespace std;
+
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
+
 #include "Global.h"
 #include "World.cpp"
 
@@ -12,11 +19,13 @@ int main()
     world.addOrganism(2, true);
     world.addOrganism(2, true);
     world.addOrganism(2, true);
-    world.addOrganism(2, true);
-    world.addOrganism(2, true);
-    world.addOrganism(2, true);
-    world.addOrganism(1, true);
-    world.addOrganism(1, true);
-    world.makeTurn();
+
+    char input;
+    while (cin.get(input))
+    {
+        if(input == 's') break;
+        world.makeTurn();
+    }
+        
     return 0;
 }

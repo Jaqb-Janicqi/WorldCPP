@@ -4,7 +4,7 @@
 
 class Antelope : public Animal {
 public:
-    Antelope(int x, int y)
+    Antelope(int x, int y) : Animal()
     {
         posX = x;
         posY = y;
@@ -13,10 +13,10 @@ public:
         id = 5;
         strength = 4;
         initiative = 4;
-        skin = ';';
+        skin = 'A';
     }
 
-    Antelope()
+    Antelope() : Animal()
     {
         posX = randInt(0, worldSizeX);
         posY = randInt(0, worldSizeY);
@@ -25,7 +25,7 @@ public:
         id = 5;
         strength = 4;
         initiative = 4;
-        skin = ';';
+        skin = 'A';
     }
 
     virtual void action()

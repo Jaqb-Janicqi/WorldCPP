@@ -5,7 +5,7 @@
 
 class Turtle : public Animal {
 public:
-    Turtle(int x, int y)
+    Turtle(int x, int y) : Animal()
     {
         posX = x;
         posY = y;
@@ -14,10 +14,10 @@ public:
         id = 4;
         strength = 2;
         initiative = 1;
-        skin = '@';
+        skin = 'T';
     }
 
-    Turtle()
+    Turtle() : Animal()
     {
         posX = randInt(0, worldSizeX);
         posY = randInt(0, worldSizeY);
@@ -26,7 +26,7 @@ public:
         id = 4;
         strength = 2;
         initiative = 1;
-        skin = '@';
+        skin = 'T';
     }
 
     void action()

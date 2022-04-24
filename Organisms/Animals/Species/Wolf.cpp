@@ -5,7 +5,7 @@
 
 class Wolf : public Animal {
 public:
-    Wolf(int x, int y)
+    Wolf(int x, int y) : Animal()
     {
         posX = x;
         posY = y;
@@ -14,10 +14,10 @@ public:
         id = 1;
         strength = 9;
         initiative = 5;
-        skin = '#';
+        skin = 'W';
     }
 
-    Wolf()
+    Wolf() : Animal()
     {
         posX = randInt(0, worldSizeX);
         posY = randInt(0, worldSizeY);
@@ -26,6 +26,6 @@ public:
         id = 1;
         strength = 9;
         initiative = 5;
-        skin = '#';
+        skin = 'W';
     }
 };

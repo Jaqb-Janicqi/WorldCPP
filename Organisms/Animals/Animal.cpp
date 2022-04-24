@@ -4,6 +4,7 @@
 
 class Animal : public Organism {
 public:
-    bool animal = true;
-    Animal(){}
+    Animal(){
+        animal = true;
+    }
 };

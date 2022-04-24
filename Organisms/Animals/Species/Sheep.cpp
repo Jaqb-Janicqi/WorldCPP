@@ -4,7 +4,7 @@
 
 class Sheep : public Animal {
 public:
-    Sheep(int x, int y)
+    Sheep(int x, int y) : Animal()
     {
         posX = x;
         posY = y;
@@ -16,7 +16,7 @@ public:
         skin = '%';
     }
 
-    Sheep()
+    Sheep() : Animal()
     {
         posX = randInt(0, worldSizeX);
         posY = randInt(0, worldSizeY);

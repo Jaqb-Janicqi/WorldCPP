@@ -31,7 +31,7 @@ public:
 private:
     vector<Organism> organisms;
 
-    void addOrganism(int orgarnismId, int x, int y, bool animal)
+    void addOrganism(int orgarnismId, int x, int y, bool animal, bool immobile)
     {
         Organism *newOrganism = NULL;
         if (animal)
@@ -173,7 +173,7 @@ public:
 
                     if (data)
                     {
-                        addOrganism(data->id, data->posX, data->posY, data->animal);
+                        addOrganism(data->id, data->posX, data->posY, data->animal, true);
                     }
                     delete data;
                 }
@@ -201,7 +201,7 @@ public:
             else i++;
         }
 
-        addOrganism(orgarnismId, x, y, animal);
+        addOrganism(orgarnismId, x, y, animal, false);
     }
 
 private:

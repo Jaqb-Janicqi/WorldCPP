@@ -4,7 +4,7 @@
 
 class Fox : public Animal {
 public:
-    Fox(int x, int y)
+    Fox(int x, int y) : Animal()
     {
         posX = x;
         posY = y;
@@ -13,10 +13,10 @@ public:
         id = 3;
         strength = 3;
         initiative = 7;
-        skin = '*';
+        skin = 'F';
     }
 
-    Fox()
+    Fox() : Animal()
     {
         posX = randInt(0, worldSizeX);
         posY = randInt(0, worldSizeY);
@@ -25,7 +25,7 @@ public:
         id = 3;
         strength = 3;
         initiative = 7;
-        skin = '*';
+        skin = 'F';
     }
 
     void action()       //TODO will never move into cell occupied by stronger organism
