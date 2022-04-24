@@ -1,6 +1,7 @@
 #include <iostream>
 #include <conio.h>
 #include <string>
+#include <vector>
 #include <stdlib.h> 
 using namespace std;
 
@@ -10,21 +11,20 @@ using namespace std;
 #define KEY_RIGHT 77
 #define KEY_SPACEBAR 32
 #define KEY_ESC 27
-
-#include "Global.h"
+#define HUMAN_ID 9999
+int worldSizeX, worldSizeY;
+#include "RandomFromRange.cpp"
 #include "World.cpp"
 
-int worldSizeX, worldSizeY;
 
 int main()
 {
     cout << "Please give world dimensions x, y" << endl;
     cin >> worldSizeX >> worldSizeY;
     World world(worldSizeX, worldSizeY);
-    world.addOrganism(0, true);
+    world.addOrganism(HUMAN_ID, true);
     world.addOrganism(2, true);
-    world.addOrganism(2, true);
-    world.addOrganism(1, true);
+    world.addOrganism(5, true);
 
     while (world.makeTurn()){}
     
