@@ -65,7 +65,7 @@ public:
         }
     }
 
-    virtual Transporter* collision(Organism *enemy, vector<Organism> &organisms)
+    virtual Transporter* collision(Organism *enemy, vector<Organism*> &organisms)
     {
         if (enemy->id == id)
         {
@@ -123,7 +123,7 @@ public:
             {
                 for (int j = 0; j < freeSpaces; j++)
                 {
-                    if (organisms[i].posY == freeCoordinates[j][0] && organisms[i].posX == freeCoordinates[j][1])
+                    if (organisms[i]->posY == freeCoordinates[j][0] && organisms[i]->posX == freeCoordinates[j][1])
                     {
                         validIndexes.erase(validIndexes.begin() + j);
                         freeSpaces--;
@@ -151,7 +151,7 @@ public:
         }
         else
         {
-            if (enemy->strength < strength)
+            if (enemy->strength > strength)
             {
                 alive = false;
                 return NULL;

@@ -20,16 +20,15 @@
 
 
 class World {
-public: 
-    const int ConstWorldSizeX, ConstworldSizeY;
-    vector<vector<char>> board;
-
+public:
     World(int x, int y) : ConstWorldSizeX(x), ConstworldSizeY(y){
         board.resize(y , vector<char> (x, ' '));
     }
 
 private:
-    vector<Organism> organisms;
+    const int ConstWorldSizeX, ConstworldSizeY;
+    vector<vector<char>> board;
+    vector<Organism*> organisms;
 
     void addOrganism(int orgarnismId, int x, int y, bool animal, bool immobile)
     {
@@ -38,6 +37,10 @@ private:
         {
             switch (orgarnismId)
             {
+            case 0:
+                newOrganism = new Human(x, y);
+                break;
+
             case 1:
                 newOrganism = new Wolf(x, y);
                 break;
@@ -95,21 +98,20 @@ private:
         {
             for (int i = organisms.size(); i >= 1; i--)
             {
-                if (!(organisms[i-1].initiative < newOrganism->initiative))
+                if (!(organisms[i-1]->initiative < newOrganism->initiative))
                 {
-                    organisms.insert(organisms.begin() + i, *newOrganism);
+                    organisms.insert(organisms.begin() + i, newOrganism);
                     break;
                 }
-                if (i == 1) organisms.insert(organisms.begin(), *newOrganism);
+                if (i == 1) organisms.insert(organisms.begin(), newOrganism);
             }
         }
-        else organisms.insert(organisms.begin(), *newOrganism);
-
-        delete newOrganism;
+        else organisms.insert(organisms.begin(), newOrganism);
     }
 
     void removeOrganism(int vectPos)
     {
+        delete organisms[vectPos];
         organisms.erase(organisms.begin() + vectPos);
     }
 
@@ -135,9 +137,10 @@ private:
 
         for (int i = 0; i < organisms.size(); i++)
         {
-            board[organisms[i].posY][organisms[i].posX] = organisms[i].draw();
+            board[organisms[i]->posY][organisms[i]->posX] = organisms[i]->draw();
         }
 
+        system("CLS");
         for (int y = 0; y < worldSizeY; y++)
         {
             if(y == 0) horizLine();
@@ -154,22 +157,28 @@ private:
     }
 
 public:
-    void makeTurn()
+    int makeTurn()
     {
+        bool humanAlive = true;
+
         for (int i = 0; i < organisms.size(); i++)
         {
-            if (organisms[i].id == 0) drawWorld();
+            if (organisms[i]->id == 0) drawWorld();
 
-            organisms[i].action();
+            organisms[i]->action();
 
             for (int j = 0; j < organisms.size(); j++)
             {
-                if (i != j && organisms[i].posX == organisms[j].posX && organisms[i].posY == organisms[j].posY)
+                if (i != j && organisms[i]->posX == organisms[j]->posX && organisms[i]->posY == organisms[j]->posY)
                 {
-                    Transporter *data = organisms[j].collision(&organisms[i], organisms);
+                    Transporter *data = organisms[j]->collision(organisms[i], organisms);
 
-                    if (!organisms[i].alive) removeOrganism(i);
-                    if (!organisms[j].alive) removeOrganism(j);
+                    if (!organisms[i]->alive) 
+                    {
+                        if(organisms[i]->id == 0) humanAlive = false;
+                        removeOrganism(i);
+                    }
+                    if (!organisms[j]->alive) removeOrganism(j);
 
                     if (data)
                     {
@@ -179,7 +188,9 @@ public:
                 }
             }
         }
-        drawWorld();
+
+        if (!humanAlive) drawWorld();
+        return humanAlive;
     }
 
     void addOrganism(int orgarnismId, bool animal)
@@ -192,7 +203,7 @@ public:
 
         while(i < organisms.size())
         {
-            if (x == organisms[i].posX && y == organisms[i].posY)
+            if (x == organisms[i]->posX && y == organisms[i]->posY)
             {
                 i = 0;
                 x = randInt(0, worldSizeX-1);
@@ -202,8 +213,5 @@ public:
         }
 
         addOrganism(orgarnismId, x, y, animal, false);
-    }
-
-private:
-    
+    }    
 };

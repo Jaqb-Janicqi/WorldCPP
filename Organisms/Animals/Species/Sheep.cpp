@@ -13,7 +13,7 @@ public:
         id = 2;
         strength = 4;
         initiative = 4;
-        skin = '%';
+        skin = 'S';
     }
 
     Sheep() : Animal()
@@ -25,6 +25,6 @@ public:
         id = 2;
         strength = 4;
         initiative = 4;
-        skin = '%';
+        skin = 'S';
     }
 };
