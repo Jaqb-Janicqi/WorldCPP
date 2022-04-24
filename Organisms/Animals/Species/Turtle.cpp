@@ -1,12 +1,12 @@
 #pragma once
 #include "../Animal.cpp"
-#include "../../../RandomFromRange.cpp"
-#include "../../../Global.h"
+
 
 class Turtle : public Animal {
 public:
     Turtle(int x, int y) : Animal()
     {
+        name = "Turtle";
         posX = x;
         posY = y;
         prevX = posX;
@@ -19,35 +19,40 @@ public:
 
     Turtle() : Animal()
     {
-        posX = randInt(0, worldSizeX);
-        posY = randInt(0, worldSizeY);
-        prevX = posX;
-        prevY = posY;
-        id = 4;
-        strength = 2;
-        initiative = 1;
-        skin = 'T';
+        Turtle(randInt(0, worldSizeX), randInt(0, worldSizeY));
     }
 
-    void action()
+    void action(vector<Organism*> &organisms)
     {
         if(!immobile && randInt(0,4) == 0)
         {
-            if(randInt(0, 1))
+            if(randInt(0, 1))        // make random move in one direction 
             {
                 int moveX = randMove();
-                while (!(moveX+posX >= 0 && moveX+posX < worldSizeX)) moveX = randMove();
-                prevX = posX;
-                posX += moveX;
-                prevY = posY;
+                if (!(moveX+posX >= 0 && moveX+posX < worldSizeX-1))
+                {
+                    action(organisms);
+                }
+                else
+                {
+                    prevY = posY;
+                    prevX = posX;
+                    posX += moveX;
+                }
             }
             else
             {
                 int moveY = randMove();
-                while (!(moveY+posY >= 0 && moveY+posY < worldSizeY)) moveY = randMove();
-                prevY = posY;
-                posY += moveY;
-                prevX = posX;
+                if (!(moveY+posY >= 0 && moveY+posY < worldSizeY-1))
+                {
+                    action(organisms);
+                }
+                else
+                {
+                    prevY = posY;
+                    prevX = posX;
+                    posY += moveY;
+                }
             }
         }
         else
@@ -58,37 +63,91 @@ public:
         }
     }
 
-    void collision(Organism *enemy)
+    Transporter* collision(Organism *enemy, vector<Organism*> &organisms)
     {
-        if (enemy->id == id)
+        if (enemy->id == id && enemy->animal == animal)
         {
             int newX, newY, smallerX, smallerY, biggerX, biggerY;
             enemy->immobile = true;
+            immobile = true;
+            enemy->posX = enemy->prevX;
+            enemy->posY = enemy->prevY;
 
-            if(enemy->posX < posX)
+            if(enemy->prevX < posX)
             {
-                smallerX = enemy->posX;
+                smallerX = enemy->prevX;
                 biggerX = posX;
             }
             else
             {
                 smallerX = posX;
-                biggerX = enemy->posX;
+                biggerX = enemy->prevX;
             }
 
-            if(enemy->posY < posY)
+            if(enemy->prevY < posY)
             {
-                smallerY = enemy->posY;
+                smallerY = enemy->prevY;
                 biggerY = posY;
             }
             else
             {
                 smallerY = posY;
-                biggerY = enemy->posY;
+                biggerY = enemy->prevY;
+            }
+            
+            int freeSpaces = 0;
+            int randomIndex;
+            vector<int> validIndexes;
+            int freeCoordinates[10][2];    // [index][0-y 1-x]
+
+            for (int y = smallerY-1; y <= biggerY+1; y++)       //get coordinates around two organisms
+            {
+                if(y != smallerY && y != biggerY && y >= 0 && y < worldSizeY) 
+                {
+                    for (int x = smallerX-1; x <= biggerX+1; x++)
+                    {
+                        if (x != smallerX && x != biggerX && x >= 0 && x < worldSizeX)
+                        {
+                            freeCoordinates[freeSpaces][0] = y;
+                            freeCoordinates[freeSpaces][1] = x;
+                            validIndexes.push_back(freeSpaces);
+                            freeSpaces++;
+                        }
+                    }
+                }
             }
 
-            while (!(newX != posX && newX != enemy->posX)) newX = randInt(smallerX-1, biggerX+1);
-            while (!(newY != posY && newY != enemy->posY)) newY = randInt(smallerY-1, biggerY+1);
+            for (int i = 0; i < organisms.size(); i++)      //remove 
+            {
+                for (int j = 0; j < freeSpaces; j++)
+                {
+                    if (organisms[i]->posY == freeCoordinates[j][0] && organisms[i]->posX == freeCoordinates[j][1])
+                    {
+                        validIndexes.erase(validIndexes.begin() + j);
+                        freeSpaces--;
+                    }
+                }
+            }
+            validIndexes.shrink_to_fit();
+
+            if (freeSpaces > 1)
+            {
+                randomIndex = randInt(0, validIndexes.size()-1);
+                newY = freeCoordinates[randomIndex][0];
+                newX = freeCoordinates[randomIndex][1];
+                Transporter *data = new Transporter(id, newX, newY, this->animal);
+                cout << "New " << name << " has been born" << endl;
+                return data;
+            }
+            else if(freeSpaces == 1)
+            {
+                newY = freeCoordinates[0][0];
+                newX = freeCoordinates[0][1];
+                Transporter *data = new Transporter(id, newX, newY, this->animal);
+                cout << "New " << name << " has been born" << endl;
+                return data;
+            }
+            else return NULL;
         }
         else
         {
@@ -96,10 +155,14 @@ public:
             {
                 enemy->posX = enemy->prevX;
                 enemy->posY = enemy->prevY;
+                cout << name << " has survived a fight with " << enemy->name << endl;
+                return NULL;
             }
             else
             {
-                enemy->alive = false;
+                alive = false;
+                cout << name << " has died to " << enemy->name << endl;
+                return NULL;
             }
         }
     }

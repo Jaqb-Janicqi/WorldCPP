@@ -1,11 +1,12 @@
 #pragma once
 #include "../Animal.cpp"
-#include "../../../Global.h"
+
 
 class Fox : public Animal {
 public:
     Fox(int x, int y) : Animal()
     {
+        name = "Fox";
         posX = x;
         posY = y;
         prevX = posX;
@@ -18,35 +19,42 @@ public:
 
     Fox() : Animal()
     {
-        posX = randInt(0, worldSizeX);
-        posY = randInt(0, worldSizeY);
-        prevX = posX;
-        prevY = posY;
-        id = 3;
-        strength = 3;
-        initiative = 7;
-        skin = 'F';
+        Fox(randInt(0, worldSizeX), randInt(0, worldSizeY));
     }
 
-    void action()       //TODO will never move into cell occupied by stronger organism
+    void action(vector<Organism*> &organisms)
     {
         if(!immobile)
         {
-            if(randInt(0, 1))
+            vector<Coordinates> freeSpaces;
+            for (int i = -1; i <= 1; i++)
             {
-                int moveX = randMove();
-                while (!(moveX+posX >= 0 && moveX+posX < worldSizeX)) moveX = randMove();
-                prevX = posX;
-                posX += moveX;
-                prevY = posY;
+                for (int j = -1; j <= 1; j++)
+                {
+                    int cellx = j+posX, celly = i+posY;
+                    if ((i == 0 || j == 0) && !(j == 0 && i == 0) && cellx < worldSizeX && cellx >=0 && celly < worldSizeY && celly >= 0)
+                    {
+                        for (int k = 0; k < organisms.size(); k++)
+                        {
+                            if(!(organisms[k]->posX == cellx && organisms[k]->posY == celly) || !organisms[k]->alive)
+                            {
+                                if(organisms[k]->strength <= strength || !organisms[k]->alive) freeSpaces.push_back(Coordinates(celly, cellx));
+                            }
+                        }
+                    }
+                }
             }
-            else
+
+            if (freeSpaces.size() > 0)
             {
-                int moveY = randMove();
-                while (!(moveY+posY >= 0 && moveY+posY < worldSizeY)) moveY = randMove();
-                prevY = posY;
-                posY += moveY;
+                int randomIndex;
+                if(freeSpaces.size() == 1) randomIndex = 0;
+                else randomIndex = randInt(0, freeSpaces.size()-1);
+
                 prevX = posX;
+                prevY = posY;
+                posX = freeSpaces[randomIndex].x;
+                posY = freeSpaces[randomIndex].y;
             }
         }
         else

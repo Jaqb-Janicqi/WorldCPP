@@ -1,16 +1,17 @@
 #pragma once
 #include "../Animal.cpp"
-#include "../../../Global.h"
+
 
 class Human : public Animal {
 public:
     Human(int x, int y) : Animal()
     {
+        name = "Human";
         posX = x;
         posY = y;
         prevX = posX;
         prevY = posY;
-        id = 0;
+        id = HUMAN_ID;
         strength = 5;
         initiative = 4;
         skin = 'H';
@@ -18,21 +19,16 @@ public:
 
     Human() : Animal()
     {
-        posX = randInt(0, worldSizeX);
-        posY = randInt(0, worldSizeY);
-        prevX = posX;
-        prevY = posY;
-        id = 0;
-        strength = 5;
-        initiative = 4;
-        skin = 'H';
+        Human(randInt(0, worldSizeX), randInt(0, worldSizeY));
     }
 
-    void action()
+    void action(vector<Organism*> &organisms)
     {
         bool moved = false, validMove = false;
         unsigned char move = 0;
         int moveX=0, moveY=0;
+        
+        cout << "You can make your move." << endl;
         
         while (!moved)
         {
@@ -90,5 +86,6 @@ public:
                 validMove = false;
             }
         }
+        system("CLS");
     }
 };

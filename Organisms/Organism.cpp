@@ -1,6 +1,5 @@
 #pragma once
 #include "../RandomFromRange.cpp"
-#include "../Global.h"
 #include "../Transporter.h"
 
 
@@ -8,9 +7,8 @@ class Organism {
 public:
     int id, strength, initiative, posX, posY, prevX, prevY;
     char skin;
-    bool immobile = false;
-    bool alive = true;
-    bool animal;
+    bool immobile = false, alive = true, animal;
+    string name;
 
     Organism(){}
 
@@ -24,7 +22,7 @@ public:
         return x-1;
     }
     
-    virtual void action()
+    virtual void action(vector<Organism*> &organisms)
     {
         if(!immobile)
         {
@@ -33,7 +31,7 @@ public:
                 int moveX = randMove();
                 if (!(moveX+posX >= 0 && moveX+posX < worldSizeX-1))
                 {
-                    action();
+                    action(organisms);
                 }
                 else
                 {
@@ -47,7 +45,7 @@ public:
                 int moveY = randMove();
                 if (!(moveY+posY >= 0 && moveY+posY < worldSizeY-1))
                 {
-                    action();
+                    action(organisms);
                 }
                 else
                 {
@@ -67,7 +65,7 @@ public:
 
     virtual Transporter* collision(Organism *enemy, vector<Organism*> &organisms)
     {
-        if (enemy->id == id)
+        if (enemy->id == id && enemy->animal == animal)
         {
             int newX, newY, smallerX, smallerY, biggerX, biggerY;
             enemy->immobile = true;
@@ -138,6 +136,7 @@ public:
                 newY = freeCoordinates[randomIndex][0];
                 newX = freeCoordinates[randomIndex][1];
                 Transporter *data = new Transporter(id, newX, newY, this->animal);
+                cout << "New " << name << " has been spawned" << endl;
                 return data;
             }
             else if(freeSpaces == 1)
@@ -145,6 +144,7 @@ public:
                 newY = freeCoordinates[0][0];
                 newX = freeCoordinates[0][1];
                 Transporter *data = new Transporter(id, newX, newY, this->animal);
+                cout << "New " << name << " has been spawned" << endl;
                 return data;
             }
             else return NULL;
@@ -154,11 +154,13 @@ public:
             if (enemy->strength > strength)
             {
                 alive = false;
+                cout << name << " has died to " << enemy->name << endl;
                 return NULL;
             }
             else
             {
                 enemy->alive = false;
+                cout << enemy->name << " has died to " << name << endl;
                 return NULL;
             }
         }

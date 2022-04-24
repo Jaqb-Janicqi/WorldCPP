@@ -1,8 +1,5 @@
-#include <vector>
-
 #pragma once
-#include "Global.h"
-#include "RandomFromRange.cpp"
+#include "Coordinates.h"
 #include "Organisms/Organism.cpp"
 #include "Organisms/Animals/Animal.cpp"
 #include "Organisms/Animals/Species/Wolf.cpp"
@@ -27,6 +24,7 @@ public:
 
 private:
     const int ConstWorldSizeX, ConstworldSizeY;
+    vector<Coordinates> spawnProtect;
     vector<vector<char>> board;
     vector<Organism*> organisms;
 
@@ -37,7 +35,7 @@ private:
         {
             switch (orgarnismId)
             {
-            case 0:
+            case HUMAN_ID:
                 newOrganism = new Human(x, y);
                 break;
 
@@ -109,12 +107,6 @@ private:
         else organisms.insert(organisms.begin(), newOrganism);
     }
 
-    void removeOrganism(int vectPos)
-    {
-        delete organisms[vectPos];
-        organisms.erase(organisms.begin() + vectPos);
-    }
-
     void drawWorld()
     {
         auto horizLine = []()
@@ -140,7 +132,8 @@ private:
             board[organisms[i]->posY][organisms[i]->posX] = organisms[i]->draw();
         }
 
-        system("CLS");
+        cout << "Now the world looks like this:" << endl;
+
         for (int y = 0; y < worldSizeY; y++)
         {
             if(y == 0) horizLine();
@@ -157,40 +150,47 @@ private:
     }
 
 public:
-    int makeTurn()
+    bool makeTurn()
     {
-        bool humanAlive = true;
+        if(spawnProtect.size() > 0) spawnProtect.clear();
+        bool keepRunning = true;
 
         for (int i = 0; i < organisms.size(); i++)
         {
-            if (organisms[i]->id == 0) drawWorld();
+            if (organisms[i]->id == HUMAN_ID) drawWorld();
 
-            organisms[i]->action();
+            organisms[i]->action(organisms);
 
             for (int j = 0; j < organisms.size(); j++)
             {
-                if (i != j && organisms[i]->posX == organisms[j]->posX && organisms[i]->posY == organisms[j]->posY)
+                if (organisms[i]->alive && organisms[j]->alive)
                 {
-                    Transporter *data = organisms[j]->collision(organisms[i], organisms);
-
-                    if (!organisms[i]->alive) 
+                    if (i != j && organisms[i]->posX == organisms[j]->posX && organisms[i]->posY == organisms[j]->posY)
                     {
-                        if(organisms[i]->id == 0) humanAlive = false;
-                        removeOrganism(i);
-                    }
-                    if (!organisms[j]->alive) removeOrganism(j);
+                        Transporter *data = organisms[j]->collision(organisms[i], organisms);
 
-                    if (data)
-                    {
-                        addOrganism(data->id, data->posX, data->posY, data->animal, true);
+                        if (data)
+                        {
+                            addOrganism(data->id, data->posX, data->posY, data->animal, true);
+                        }
+                        delete data;
                     }
-                    delete data;
+                }
+            }
+            for (int k = organisms.size()-1; k >= 0; k--)
+            {
+                if(organisms[k]->alive == false) 
+                {
+                    delete organisms[k];
+                    organisms.erase(organisms.begin() + k);
                 }
             }
         }
 
-        if (!humanAlive) drawWorld();
-        return humanAlive;
+        if (organisms.size() <= 1) keepRunning = false;       
+
+        if (!keepRunning) drawWorld();
+        return keepRunning;
     }
 
     void addOrganism(int orgarnismId, bool animal)
@@ -201,13 +201,46 @@ public:
         int y = randInt(0, worldSizeY-1);
         int i = 0;
 
+        if(orgarnismId == HUMAN_ID && animal == true)
+        {
+            int index = 0;
+            for (int j = -1; j <= 1; j++)
+            {
+                for (int k = -1; k <= 1; k++)
+                {
+                    spawnProtect.push_back(Coordinates(y+j, x+k));
+                    index++;
+                }
+            }
+        }
+
+        if(organisms.size() >= worldSizeX*worldSizeY-spawnProtect.size()) return;
+
         while(i < organisms.size())
         {
+            auto rollNew = [&]()
+            {
+                x = randInt(0, worldSizeX-1);
+                y = randInt(0, worldSizeY-1);
+            };
+
+            if(spawnProtect.size() > 0)
+            {
+                for (int j = 0; j < spawnProtect.size(); j++)
+                {
+                    if (x == spawnProtect[i].x && y == spawnProtect[i].y)
+                    {
+                        i = j = 0;
+                        rollNew();
+                        break;
+                    }
+                }
+            }
+
             if (x == organisms[i]->posX && y == organisms[i]->posY)
             {
                 i = 0;
-                x = randInt(0, worldSizeX-1);
-                y = randInt(0, worldSizeY-1);
+                rollNew();
             } 
             else i++;
         }
