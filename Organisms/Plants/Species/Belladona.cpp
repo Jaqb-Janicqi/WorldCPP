@@ -3,25 +3,22 @@
 
 class Belladona : public Plant {
 public:
-    Belladona(int x, int y)
+    Belladona(int x, int y) : Plant()
     {
         posX = x;
         posY = y;
         prevX = posX;
         prevY = posY;
         id = 4;
-        strength = 99;
-        skin = '!';
+        baseStrength = strength = 99;
+        skin = 'B';
+        name = "Belladona";
     }
 
     Belladona()
     {
         posX = randInt(0, worldSizeX);
         posY = randInt(0, worldSizeY);
-        prevX = posX;
-        prevY = posY;
-        id = 4;
-        strength = 99;
-        skin = '!';
+        Belladona(posX, posY);
     }
 };

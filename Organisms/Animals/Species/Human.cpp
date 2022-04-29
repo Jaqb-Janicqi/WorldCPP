@@ -12,7 +12,7 @@ public:
         prevX = posX;
         prevY = posY;
         id = HUMAN_ID;
-        strength = 5;
+        baseStrength = strength = 5;
         initiative = 4;
         skin = 'H';
     }
@@ -22,14 +22,25 @@ public:
         Human(randInt(0, worldSizeX), randInt(0, worldSizeY));
     }
 
-    void action(vector<Organism*> &organisms)
+    Transporter* action(vector<Organism*> &organisms, vector<string> &events)
     {
         bool moved = false, validMove = false;
         unsigned char move = 0;
         int moveX=0, moveY=0;
         
         cout << "You can make your move." << endl;
-        
+        if(inactive) inactive = false;
+        else
+        {
+            if(strength == baseStrength) cout << "Potion avaible!" << endl;
+            else 
+            {
+                strength--;
+                if(strength == baseStrength) cout << "Potion avaible!" << endl;
+                else cout << "You have " << strength << " strength" << endl;
+            }
+        }
+
         while (!moved)
         {
             while (!validMove)
@@ -59,7 +70,28 @@ public:
                 
                 case KEY_ESC:
                     alive = false;
+                    cerr << "Human was killed by Esc key." << endl;
+                    system("PAUSE");
+                    moved = true;
                     validMove = true;
+                    break;
+                
+                case KEY_SPACEBAR:
+                    if(strength <= baseStrength)
+                    {
+                        strength = 10;
+                        move = 0;
+                        moveX = 0;
+                        moveY = 0;
+                        cout << "Potion used! You now have " << strength << " strength!" << endl;
+                    }
+                    else cout << "You cannot use a potion yet." << endl;
+                    break;
+                
+                case KEY_S:
+                    events.push_back("SAVE");
+                    validMove = true;
+                    moved = true;
                     break;
                 
                 default:
@@ -71,21 +103,25 @@ public:
                 }
             }
 
-            if (posX+moveX < worldSizeX && posX+moveX >= 0 && posY+moveY < worldSizeY && posY+moveY >= 0)
+            if(events.size() == 0 || (events.size() > 0 && events.back() != "SAVE"))
             {
-                moved = true;
-                prevX = posX;
-                prevY = posY;
-                posX += moveX;
-                posY += moveY;
-            }
-            else
-            {
-                cout << "Invalid move" << endl;
-                move = moveX = moveY = 0;
-                validMove = false;
+                if (posX+moveX < worldSizeX && posX+moveX >= 0 && posY+moveY < worldSizeY && posY+moveY >= 0)
+                {
+                    moved = true;
+                    prevX = posX;
+                    prevY = posY;
+                    posX += moveX;
+                    posY += moveY;
+                }
+                else
+                {
+                    cout << "Invalid move" << endl;
+                    move = moveX = moveY = 0;
+                    validMove = false;
+                }
             }
         }
         system("CLS");
+        return NULL;
     }
 };

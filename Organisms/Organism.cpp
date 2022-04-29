@@ -5,71 +5,25 @@
 
 class Organism {
 public:
-    int id, strength, initiative, posX, posY, prevX, prevY;
+    int id, strength, baseStrength, initiative, posX, posY, prevX, prevY;
     char skin;
-    bool immobile = false, alive = true, animal;
+    bool inactive = false, alive = true, animal;
     string name;
 
     Organism(){}
-
-    virtual int randMove()
-    {
-        int x = 1;
-        while (x == 1)
-        {
-            x = randInt(0, 2);
-        }
-        return x-1;
-    }
     
-    virtual void action(vector<Organism*> &organisms)
+    virtual Transporter* action(vector<Organism*> &organisms, vector<string> &events)
     {
-        if(!immobile)
-        {
-            if(randInt(0, 1))        // make random move in one direction 
-            {
-                int moveX = randMove();
-                if (!(moveX+posX >= 0 && moveX+posX < worldSizeX-1))
-                {
-                    action(organisms);
-                }
-                else
-                {
-                    prevY = posY;
-                    prevX = posX;
-                    posX += moveX;
-                }
-            }
-            else
-            {
-                int moveY = randMove();
-                if (!(moveY+posY >= 0 && moveY+posY < worldSizeY-1))
-                {
-                    action(organisms);
-                }
-                else
-                {
-                    prevY = posY;
-                    prevX = posX;
-                    posY += moveY;
-                }
-            }
-        }
-        else
-        {
-            prevX = posX;
-            prevY = posY;
-            immobile = false;
-        }
+        return NULL;
     }
 
-    virtual Transporter* collision(Organism *enemy, vector<Organism*> &organisms)
+    virtual Transporter* collision(Organism *enemy, vector<Organism*> &organisms, vector<string> &events)
     {
         if (enemy->id == id && enemy->animal == animal)
         {
             int newX, newY, smallerX, smallerY, biggerX, biggerY;
-            enemy->immobile = true;
-            immobile = true;
+            enemy->inactive = true;
+            inactive = true;
             enemy->posX = enemy->prevX;
             enemy->posY = enemy->prevY;
 
@@ -136,7 +90,7 @@ public:
                 newY = freeCoordinates[randomIndex][0];
                 newX = freeCoordinates[randomIndex][1];
                 Transporter *data = new Transporter(id, newX, newY, this->animal);
-                cout << "New " << name << " has been spawned" << endl;
+                events.push_back("New " + name + " has been spawned!");
                 return data;
             }
             else if(freeSpaces == 1)
@@ -144,7 +98,7 @@ public:
                 newY = freeCoordinates[0][0];
                 newX = freeCoordinates[0][1];
                 Transporter *data = new Transporter(id, newX, newY, this->animal);
-                cout << "New " << name << " has been spawned" << endl;
+                events.push_back("New " + name + " has been spawned!");
                 return data;
             }
             else return NULL;
@@ -154,19 +108,19 @@ public:
             if (enemy->strength > strength)
             {
                 alive = false;
-                cout << name << " has died to " << enemy->name << endl;
+                events.push_back(name + " has died to " + enemy->name + ".");
                 return NULL;
             }
             else
             {
                 enemy->alive = false;
-                cout << enemy->name << " has died to " << name << endl;
+                events.push_back(enemy->name + " has died to " + name + ".");
                 return NULL;
             }
         }
     }
 
-    virtual char draw()     //place organism's char in its cell
+    virtual char draw()     //return organism's char
     {
         return skin;
     }

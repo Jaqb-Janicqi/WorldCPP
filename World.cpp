@@ -17,18 +17,159 @@
 
 
 class World {
-public:
-    World(int x, int y) : ConstWorldSizeX(x), ConstworldSizeY(y){
-        board.resize(y , vector<char> (x, ' '));
-    }
-
 private:
     const int ConstWorldSizeX, ConstworldSizeY;
     vector<Coordinates> spawnProtect;
     vector<vector<char>> board;
     vector<Organism*> organisms;
+    vector<string> events;
 
-    void addOrganism(int orgarnismId, int x, int y, bool animal, bool immobile)
+    void drawWorld()
+    {
+        auto horizLine = []()
+        {
+            for (int i = 0; i < worldSizeX+2; i++)
+            {
+                if(i != 0) cout << ' ';
+                cout << '=';
+            }
+            cout << endl;
+        };
+
+        system("CLS");
+
+        for (int y = 0; y < worldSizeY; y++)
+        {
+            for (int x = 0; x < worldSizeX; x++)
+            {
+                board[y][x] = ' ';
+            }
+        }
+
+        for (int i = 0; i < organisms.size(); i++)
+        {
+            board[organisms[i]->posY][organisms[i]->posX] = organisms[i]->draw();
+        }
+
+        cout << "Now the world looks like this:" << endl;
+
+        for (int y = 0; y < worldSizeY; y++)
+        {
+            if(y == 0) horizLine();
+
+            for (int x = 0; x < worldSizeX; x++)
+            {
+                if(x == 0) cout << '|' << ' ';
+                cout << board[y][x] << ' ';
+            }
+            cout << '|' << endl;
+
+            if(y == worldSizeY-1) horizLine();
+        }
+
+        for (int i = 0; i < AMOUNT_OF_LINES && events.size() > 0; i++)
+        {
+            cout << events.back() << endl;
+            events.pop_back();
+        }
+        horizLine();
+        events.clear();
+        
+    }
+
+    void saveState()
+    {
+        for (int i = 0; i < organisms.size(); i++)
+        {
+            organisms[i]->inactive = true;
+            if(organisms[i]->id != HUMAN_ID) break;
+        }
+        
+        ofstream("savefile.txt");
+        ofstream file;
+        file.open("savefile.txt");
+
+        file << worldSizeX << ' ' << worldSizeY << ' ' << organisms.size() << endl;
+
+        for (int i = 0; i < organisms.size(); i++)
+        {
+            file << organisms[i]->id << ' ' << organisms[i]->animal << ' ' << organisms[i]->posX << ' ' << organisms[i]->posY << ' '
+                    << organisms[i]->prevX << ' ' << organisms[i]->prevY << ' ' << organisms[i]->strength << ' '
+                    << organisms[i]->baseStrength << ' ' << organisms[i]->inactive << ' ' << organisms[i]->alive 
+            << endl;
+        }
+
+        file.close();
+        events.pop_back();
+    }
+
+public:
+    World(int x, int y) : ConstWorldSizeX(x), ConstworldSizeY(y)    {
+        board.resize(y , vector<char> (x, ' '));
+    }
+
+    bool makeTurn()
+    {
+        if(spawnProtect.size() > 0) spawnProtect.clear();
+        bool keepRunning = true;
+        Transporter *data = NULL;
+
+        for (int i = 0; i < organisms.size(); i++)
+        {
+            start: if (organisms[i]->id == HUMAN_ID) drawWorld();
+
+            data = organisms[i]->action(organisms, events);
+            if(data) 
+            {
+                addOrganism(data->id, data->posX, data->posY, data->animal, true);
+                data = NULL;
+            }
+
+            if(events.size() > 0 && events.back() == "SAVE") 
+            {
+                saveState();
+                goto start;
+            }
+
+            for (int j = 0; j < organisms.size(); j++)
+            {
+                if (organisms[i]->alive && organisms[j]->alive)
+                {
+                    if (i != j && organisms[i]->posX == organisms[j]->posX && organisms[i]->posY == organisms[j]->posY)
+                    {
+                        data = organisms[j]->collision(organisms[i], organisms, events);
+
+                        if (data)
+                        {
+                            addOrganism(data->id, data->posX, data->posY, data->animal, true);
+                        }
+                        delete data;
+                    }
+                }
+            }
+            for (int k = organisms.size()-1; k >= 0; k--)
+            {
+                if(organisms[k]->alive == false) 
+                {
+                    if(organisms[k]->id == HUMAN_ID) keepRunning = false;
+                    delete organisms[k];
+                    organisms.erase(organisms.begin() + k);
+                }
+            }
+        }
+
+        if (organisms.size() <= 1) keepRunning = false;       
+
+        if (!keepRunning) 
+        {
+            drawWorld();
+            cerr << "Human died." << endl;
+            system("PAUSE");
+        }
+        return keepRunning;
+    }
+
+    Organism* addOrganism(int orgarnismId, int x, int y, bool animal, bool inactive)
     {
         Organism *newOrganism = NULL;
         if (animal)
@@ -105,92 +246,7 @@ private:
             }
         }
         else organisms.insert(organisms.begin(), newOrganism);
-    }
-
-    void drawWorld()
-    {
-        auto horizLine = []()
-        {
-            for (int i = 0; i < worldSizeX+2; i++)
-            {
-                if(i != 0) cout << ' ';
-                cout << '=';
-            }
-            cout << endl;
-        };
-
-        for (int y = 0; y < worldSizeY; y++)
-        {
-            for (int x = 0; x < worldSizeX; x++)
-            {
-                board[y][x] = ' ';
-            }
-        }
-
-        for (int i = 0; i < organisms.size(); i++)
-        {
-            board[organisms[i]->posY][organisms[i]->posX] = organisms[i]->draw();
-        }
-
-        cout << "Now the world looks like this:" << endl;
-
-        for (int y = 0; y < worldSizeY; y++)
-        {
-            if(y == 0) horizLine();
-
-            for (int x = 0; x < worldSizeX; x++)
-            {
-                if(x == 0) cout << '|' << ' ';
-                cout << board[y][x] << ' ';
-            }
-            cout << '|' << endl;
-
-            if(y == worldSizeY-1) horizLine();
-        }
-    }
-
-public:
-    bool makeTurn()
-    {
-        if(spawnProtect.size() > 0) spawnProtect.clear();
-        bool keepRunning = true;
-
-        for (int i = 0; i < organisms.size(); i++)
-        {
-            if (organisms[i]->id == HUMAN_ID) drawWorld();
-
-            organisms[i]->action(organisms);
-
-            for (int j = 0; j < organisms.size(); j++)
-            {
-                if (organisms[i]->alive && organisms[j]->alive)
-                {
-                    if (i != j && organisms[i]->posX == organisms[j]->posX && organisms[i]->posY == organisms[j]->posY)
-                    {
-                        Transporter *data = organisms[j]->collision(organisms[i], organisms);
-
-                        if (data)
-                        {
-                            addOrganism(data->id, data->posX, data->posY, data->animal, true);
-                        }
-                        delete data;
-                    }
-                }
-            }
-            for (int k = organisms.size()-1; k >= 0; k--)
-            {
-                if(organisms[k]->alive == false) 
-                {
-                    delete organisms[k];
-                    organisms.erase(organisms.begin() + k);
-                }
-            }
-        }
-
-        if (organisms.size() <= 1) keepRunning = false;       
-
-        if (!keepRunning) drawWorld();
-        return keepRunning;
+        return newOrganism;
     }
 
     void addOrganism(int orgarnismId, bool animal)
@@ -246,5 +302,5 @@ public:
         }
 
         addOrganism(orgarnismId, x, y, animal, false);
-    }    
+    }
 };

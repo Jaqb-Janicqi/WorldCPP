@@ -12,7 +12,7 @@ public:
         prevX = posX;
         prevY = posY;
         id = 5;
-        strength = 4;
+        baseStrength = strength = 4;
         initiative = 4;
         skin = 'A';
     }
@@ -22,9 +22,9 @@ public:
         Antelope(randInt(0, worldSizeX), randInt(0, worldSizeY));
     }
 
-    void action(vector<Organism*> &organisms)
+    Transporter* action(vector<Organism*> &organisms)
     {
-        if(!immobile)
+        if(!inactive)
         {
             if(randInt(0, 1))
             {
@@ -47,17 +47,18 @@ public:
         {
             prevX = posX;
             prevY = posY;
-            immobile = false;
+            inactive = false;
         }
+        return NULL;
     }
 
-    virtual Transporter* collision(Organism *enemy, vector<Organism*> &organisms)
+    virtual Transporter* collision(Organism *enemy, vector<Organism*> &organisms, vector<string> &events)
     {
         if (enemy->id == id && enemy->animal == animal)
         {
             int newX, newY, smallerX, smallerY, biggerX, biggerY;
-            enemy->immobile = true;
-            immobile = true;
+            enemy->inactive = true;
+            inactive = true;
             enemy->posX = enemy->prevX;
             enemy->posY = enemy->prevY;
 
@@ -124,7 +125,7 @@ public:
                 newY = freeCoordinates[randomIndex][0];
                 newX = freeCoordinates[randomIndex][1];
                 Transporter *data = new Transporter(id, newX, newY, this->animal);
-                cout << "New animal " << name << " has been born" << endl;
+                events.push_back("New " + name + " has been born!");
                 return data;
             }
             else if(freeSpaces == 1)
@@ -132,7 +133,7 @@ public:
                 newY = freeCoordinates[0][0];
                 newX = freeCoordinates[0][1];
                 Transporter *data = new Transporter(id, newX, newY, this->animal);
-                cout << "New animal " << name << " has been born" << endl;
+                events.push_back("New " + name + " has been born!");
                 return data;
             }
             else return NULL;
@@ -144,13 +145,13 @@ public:
                 if (enemy->strength > strength)
                 {
                     alive = false;
-                    cout << name << " has died to " << enemy->name << endl;
+                    events.push_back(name + " has died to " + enemy->name + ".");
                     return NULL;
                 }
                 else
                 {
                     enemy->alive = false;
-                    cout << enemy->name << " has died to " << name << endl;
+                    events.push_back(enemy->name + " has died to " + name + ".");
                     return NULL;
                 }
             }

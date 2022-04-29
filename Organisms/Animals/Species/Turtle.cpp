@@ -12,7 +12,7 @@ public:
         prevX = posX;
         prevY = posY;
         id = 4;
-        strength = 2;
+        baseStrength = strength = 2;
         initiative = 1;
         skin = 'T';
     }
@@ -22,16 +22,16 @@ public:
         Turtle(randInt(0, worldSizeX), randInt(0, worldSizeY));
     }
 
-    void action(vector<Organism*> &organisms)
+    Transporter* action(vector<Organism*> &organisms, vector<string> &events)
     {
-        if(!immobile && randInt(0,4) == 0)
+        if(!inactive && randInt(0,4) == 0)
         {
             if(randInt(0, 1))        // make random move in one direction 
             {
                 int moveX = randMove();
                 if (!(moveX+posX >= 0 && moveX+posX < worldSizeX-1))
                 {
-                    action(organisms);
+                    action(organisms, events);
                 }
                 else
                 {
@@ -45,7 +45,7 @@ public:
                 int moveY = randMove();
                 if (!(moveY+posY >= 0 && moveY+posY < worldSizeY-1))
                 {
-                    action(organisms);
+                    action(organisms, events);
                 }
                 else
                 {
@@ -59,17 +59,18 @@ public:
         {
             prevX = posX;
             prevY = posY;
-            immobile = false;
+            inactive = false;
         }
+        return NULL;
     }
 
-    Transporter* collision(Organism *enemy, vector<Organism*> &organisms)
+    Transporter* collision(Organism *enemy, vector<Organism*> &organisms, vector<string> &events)
     {
         if (enemy->id == id && enemy->animal == animal)
         {
             int newX, newY, smallerX, smallerY, biggerX, biggerY;
-            enemy->immobile = true;
-            immobile = true;
+            enemy->inactive = true;
+            inactive = true;
             enemy->posX = enemy->prevX;
             enemy->posY = enemy->prevY;
 
@@ -136,7 +137,7 @@ public:
                 newY = freeCoordinates[randomIndex][0];
                 newX = freeCoordinates[randomIndex][1];
                 Transporter *data = new Transporter(id, newX, newY, this->animal);
-                cout << "New " << name << " has been born" << endl;
+                events.push_back("New " + name + " has been born!");
                 return data;
             }
             else if(freeSpaces == 1)
@@ -144,7 +145,7 @@ public:
                 newY = freeCoordinates[0][0];
                 newX = freeCoordinates[0][1];
                 Transporter *data = new Transporter(id, newX, newY, this->animal);
-                cout << "New " << name << " has been born" << endl;
+                events.push_back("New " + name + " has been born!");
                 return data;
             }
             else return NULL;
@@ -155,13 +156,13 @@ public:
             {
                 enemy->posX = enemy->prevX;
                 enemy->posY = enemy->prevY;
-                cout << name << " has survived a fight with " << enemy->name << endl;
+                events.push_back(name + " has reflected attack from " + enemy->name + '.');
                 return NULL;
             }
             else
             {
                 alive = false;
-                cout << name << " has died to " << enemy->name << endl;
+                events.push_back(name + " has diet to " + enemy->name + '.');
                 return NULL;
             }
         }

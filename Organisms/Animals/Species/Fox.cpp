@@ -12,7 +12,7 @@ public:
         prevX = posX;
         prevY = posY;
         id = 3;
-        strength = 3;
+        baseStrength = strength = 3;
         initiative = 7;
         skin = 'F';
     }
@@ -22,9 +22,9 @@ public:
         Fox(randInt(0, worldSizeX), randInt(0, worldSizeY));
     }
 
-    void action(vector<Organism*> &organisms)
+    Transporter* action(vector<Organism*> &organisms, vector<string> &events)
     {
-        if(!immobile)
+        if(!inactive)
         {
             vector<Coordinates> freeSpaces;
             for (int i = -1; i <= 1; i++)
@@ -61,7 +61,8 @@ public:
         {
             prevX = posX;
             prevY = posY;
-            immobile = false;
+            inactive = false;
         }
+    return NULL;
     }
 };

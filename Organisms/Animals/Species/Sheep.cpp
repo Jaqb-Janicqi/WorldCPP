@@ -12,7 +12,7 @@ public:
         prevX = posX;
         prevY = posY;
         id = 2;
-        strength = 4;
+        baseStrength = strength = 4;
         initiative = 4;
         skin = 'S';
     }
