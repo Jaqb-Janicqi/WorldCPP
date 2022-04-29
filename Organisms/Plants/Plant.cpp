@@ -42,6 +42,8 @@ public:
                     {
                         validIndexes.erase(validIndexes.begin() + j);
                         freeSpaces--;
+                        i = 0;
+                        break;
                     }
                 }
             }
