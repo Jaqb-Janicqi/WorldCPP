@@ -71,9 +71,10 @@ public:
                 case KEY_ESC:
                     alive = false;
                     cerr << "Human was killed by Esc key." << endl;
-                    system("PAUSE");
                     moved = true;
                     validMove = true;
+                    system("PAUSE");
+                    exit(0);
                     break;
                 
                 case KEY_SPACEBAR:
@@ -92,6 +93,7 @@ public:
                     events.push_back("SAVE");
                     validMove = true;
                     moved = true;
+                    inactive = true;
                     break;
                 
                 default:
