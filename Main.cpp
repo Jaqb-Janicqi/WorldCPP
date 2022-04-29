@@ -31,6 +31,7 @@ World* recallState(World *world)
     {                                               
         cerr << "Save file can't be opened or doesn't exist!" << endl;
         system("PAUSE");
+        return NULL;
     }
 
     int x, y, amount;
@@ -82,7 +83,8 @@ int main()
         else if(move == KEY_S)
         {
             world = recallState(world);
-            goto play;
+            if(world) goto play;
+            else move = 0;
         }
         else
         {
